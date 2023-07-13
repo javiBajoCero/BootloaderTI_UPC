@@ -14,14 +14,16 @@
 #define TIMER0clockfreq 90      //Mhz
 #define Systick_period  1000    //us=1ms
 
+Uint32 systemtick=0;
 
 /**
 * \brief interruption handler del tim0 / systick.
-* It just advances the systemtick.
+* It just advances the systemtick +1.
 *
 */
 interrupt void interrupt_systick(void){
-    GpioDataRegs.GPBTOGGLE.bit.GPIO39=0x01;//Toggles blue LED D10
+    GpioDataRegs.GPBTOGGLE.bit.GPIO39=0x01; //Toggles blue LED D10 (debugging)
+    systemtick++;                           //adds +1 to system tick
     PieCtrlRegs.PIEACK.all= PIEACK_GROUP1;
 }
 
@@ -49,4 +51,13 @@ void initSystick(void){
     PieCtrlRegs.PIEACK.bit.ACK1=1;
     //arranca el timer
     StartCpuTimer0();
+}
+
+/**
+* \brief Basic getter
+* exposes local systemtick to outside code, (much like ST's HAL_GetTick())
+*
+*/
+Uint32 getTick(void){
+    return systemtick;
 }
