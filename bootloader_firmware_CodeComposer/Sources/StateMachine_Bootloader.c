@@ -6,10 +6,14 @@
  *  \date      Jul 10, 2023
  */
 
+#include "F2806x_Device.h"
+#include "Systick_Bootloader.h"
 #include "StateMachine_Bootloader.h"
 #include "Canbus_Bootloader.h"
 #include "FLASHhandling_Bootloader.h"
-#include "Systick_Bootlaoder.h"
+
+//
+STATEMACHINE_struct state_StateMachine={st_wait,0x00,0x00};
 
 /**
 * \brief Contiene todas las funciones de inicialización.
@@ -17,7 +21,9 @@
 *
 */
 void initBootloader(void){
-
+    initSystick();
+    initFLASHhandling();
+    initCanbus();
 }
 
 /**

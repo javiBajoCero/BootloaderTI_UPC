@@ -1,44 +1,15 @@
 /*
 //###########################################################################
 //
-// FILE:    F28069M.cmd
+// FILE:    F28069.cmd
 //
-// TITLE:   Linker Command File For F28069M Device
+// TITLE:   Linker Command File For F28069 Device
 //
 //###########################################################################
-// $TI Release: F2806x C/C++ Header Files and Peripheral Examples V135 $ 
-// $Release Date: Sep 8, 2012 $ 
-// $Copyright:
-// Copyright (C) 2009-2023 Texas Instruments Incorporated - http://www.ti.com/
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions 
-// are met:
-// 
-//   Redistributions of source code must retain the above copyright 
-//   notice, this list of conditions and the following disclaimer.
-// 
-//   Redistributions in binary form must reproduce the above copyright
-//   notice, this list of conditions and the following disclaimer in the 
-//   documentation and/or other materials provided with the   
-//   distribution.
-// 
-//   Neither the name of Texas Instruments Incorporated nor the names of
-//   its contributors may be used to endorse or promote products derived
-//   from this software without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
-// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// $
+// $TI Release: F2806x C/C++ Header Files and Peripheral Examples V150 $ 
+// $Release Date: June 16, 2015 $ 
+// $Copyright: Copyright (C) 2011-2015 Texas Instruments Incorporated -
+//             http://www.ti.com/ ALL RIGHTS RESERVED $
 //###########################################################################
 */
 
@@ -51,7 +22,7 @@
 // peripheral structures to the proper locations within
 // the memory map.
 //
-// The header linker files are found in <base>\headers\cmd
+// The header linker files are found in <base>\F2806x_headers\cmd
 //
 // For BIOS applications add:      F2806x_Headers_BIOS.cmd
 // For nonBIOS applications add:   F2806x_Headers_nonBIOS.cmd
@@ -71,7 +42,7 @@
 /* Uncomment this line to include file only for BIOS applications */
 /* -l F2806x_Headers_BIOS.cmd */
 
-/* 2) In your project add the path to <base>\headers\cmd to the
+/* 2) In your project add the path to <base>\F2806x_headers\cmd to the
    library search path under project->build options, linker tab,
    library search path (-i).
 /*========================================================= */
@@ -96,8 +67,8 @@ MEMORY
 {
 PAGE 0 :   /* Program Memory */
            /* Memory (RAM/FLASH/OTP) blocks can be moved to PAGE1 for data allocation */
-   RAML0       : origin = 0x008000, length = 0x000800     /* on-chip RAM block L0 */
-   RAML1       : origin = 0x008800, length = 0x000400     /* on-chip RAM block L1 */
+   RAML0       : origin = 0x008000, length = 0x000E00     /* on-chip RAM block L0 */
+   RAML1       : origin = 0x008E00, length = 0x000200     /* on-chip RAM block L1 */
    OTP         : origin = 0x3D7800, length = 0x000400     /* on-chip OTP */
 
    FLASHH      : origin = 0x3D8000, length = 0x004000     /* on-chip FLASH */
@@ -106,15 +77,15 @@ PAGE 0 :   /* Program Memory */
    FLASHE      : origin = 0x3E4000, length = 0x004000     /* on-chip FLASH */   
    FLASHD      : origin = 0x3E8000, length = 0x004000     /* on-chip FLASH */
    FLASHC      : origin = 0x3EC000, length = 0x004000     /* on-chip FLASH */
-   FLASHA_B    : origin = 0x3F0000, length = 0x007F80     /* on-chip FLASH */
+   FLASHA      : origin = 0x3F4000, length = 0x003F80     /* on-chip FLASH */
    CSM_RSVD    : origin = 0x3F7F80, length = 0x000076     /* Part of FLASHA.  Program with all 0x0000 when CSM is in use. */
    BEGIN       : origin = 0x3F7FF6, length = 0x000002     /* Part of FLASHA.  Used for "boot to Flash" bootloader mode. */
    CSM_PWL_P0  : origin = 0x3F7FF8, length = 0x000008     /* Part of FLASHA.  CSM password locations in FLASHA */
 
-   FPUTABLES   : origin = 0x3FD590, length = 0x0006A0	 /* FPU Tables in Boot ROM */
-   IQTABLES    : origin = 0x3FDC30, length = 0x000B50    /* IQ Math Tables in Boot ROM */
-   IQTABLES2   : origin = 0x3FE780, length = 0x00008C    /* IQ Math Tables in Boot ROM */
-   IQTABLES3   : origin = 0x3FE80C, length = 0x0000AA	 /* IQ Math Tables in Boot ROM */
+   FPUTABLES   : origin = 0x3FD860, length = 0x0006A0	  /* FPU Tables in Boot ROM */
+   IQTABLES    : origin = 0x3FDF00, length = 0x000B50     /* IQ Math Tables in Boot ROM */
+   IQTABLES2   : origin = 0x3FEA50, length = 0x00008C     /* IQ Math Tables in Boot ROM */
+   IQTABLES3   : origin = 0x3FEADC, length = 0x0000AA	  /* IQ Math Tables in Boot ROM */
 
    ROM         : origin = 0x3FF3B0, length = 0x000C10     /* Boot ROM */
    RESET       : origin = 0x3FFFC0, length = 0x000002     /* part of boot ROM  */
@@ -127,13 +98,15 @@ PAGE 1 :   /* Data Memory */
    BOOT_RSVD   : origin = 0x000000, length = 0x000050     /* Part of M0, BOOT rom will use this for stack */
    RAMM0       : origin = 0x000050, length = 0x0003B0     /* on-chip RAM block M0 */
    RAMM1       : origin = 0x000400, length = 0x000400     /* on-chip RAM block M1 */
-   RAML2_3     : origin = 0x008C00, length = 0x001400     /* on-chip RAM block L2 */
+   RAML2       : origin = 0x008C00, length = 0x000400     /* on-chip RAM block L2 */
+   RAML3       : origin = 0x009000, length = 0x001000	  /* on-chip RAM block L3 */
    RAML4       : origin = 0x00A000, length = 0x002000     /* on-chip RAM block L4 */
    RAML5       : origin = 0x00C000, length = 0x002000     /* on-chip RAM block L5 */
    RAML6       : origin = 0x00E000, length = 0x002000     /* on-chip RAM block L6 */
    RAML7       : origin = 0x010000, length = 0x002000     /* on-chip RAM block L7 */
-   RAML8       : origin = 0x012000, length = 0x001800     /* on-chip RAM block L8 */
+   RAML8       : origin = 0x012000, length = 0x002000     /* on-chip RAM block L8 */
    USB_RAM     : origin = 0x040000, length = 0x000800     /* USB RAM		  */   
+   FLASHB      : origin = 0x3F0000, length = 0x004000     /* on-chip FLASH */     
 }
 
 /* Allocate sections to memory blocks.
@@ -148,15 +121,16 @@ SECTIONS
 {
 
    /* Allocate program areas: */
-   .cinit              : > FLASHA_B,   PAGE = 0
-   .pinit              : > FLASHA_B,   PAGE = 0
-   .text               : > FLASHA_B,   PAGE = 0
+   .cinit              : > FLASHA,     PAGE = 0
+   .pinit              : > FLASHA,     PAGE = 0
+   .text               : > FLASHA,     PAGE = 0
    codestart           : > BEGIN,      PAGE = 0
    ramfuncs            : LOAD = FLASHD,
                          RUN = RAML0,
                          LOAD_START(_RamfuncsLoadStart),
                          LOAD_END(_RamfuncsLoadEnd),
                          RUN_START(_RamfuncsRunStart),
+						 LOAD_SIZE(_RamfuncsLoadSize),
                          PAGE = 0
 
    csmpasswds          : > CSM_PWL_P0, PAGE = 0
@@ -164,16 +138,24 @@ SECTIONS
 
    /* Allocate uninitalized data sections: */
    .stack              : > RAMM0,      PAGE = 1
-   .ebss               : > RAML2_3,    PAGE = 1
-   .esysmem            : > RAML2_3,    PAGE = 1
+   .ebss               : > RAML3,      PAGE = 1
+   .esysmem            : > RAML2,      PAGE = 1
 
    /* Initalized sections to go in Flash */
    /* For SDFlash to program these, they must be allocated to page 0 */
-   .econst             : > FLASHA_B,   PAGE = 0
-   .switch             : > FLASHA_B,   PAGE = 0
+   .econst             : > FLASHA,     PAGE = 0
+   .switch             : > FLASHA,     PAGE = 0
 
    /* Allocate IQ math areas: */
-   IQmath              : > FLASHA_B,   PAGE = 0            /* Math Code */
+   IQmath 			   : LOAD = FLASHA,
+   						 RUN = RAML1 /*RAML0*/
+                         LOAD_START(_IQfuncsLoadStart),
+                         LOAD_SIZE(_IQfuncsLoadSize),
+                         LOAD_END(_IQfuncsLoadEnd),
+                         RUN_START(_IQfuncsRunStart),
+                         RUN_SIZE(_IQfuncsRunSize),
+                         RUN_END(_IQfuncsRunEnd),
+                         PAGE = 0
    IQmathTables        : > IQTABLES,   PAGE = 0, TYPE = NOLOAD
    
    /* Allocate FPU math areas: */
@@ -199,21 +181,21 @@ SECTIONS
 
    }
    */
-   /* Uncomment the section below if calling the IQNasin() or IQasin()
-      functions from the IQMath.lib library in order to utilize the
-      relevant IQ Math table in Boot ROM (This saves space and Boot ROM
-      is 1 wait-state). If this section is not uncommented, IQmathTables2
-      will be loaded into other memory (SARAM, Flash, etc.) and will take
-      up space, but 0 wait-state is possible.
-   */
-   /*
-   IQmathTables3    : > IQTABLES3, PAGE = 0, TYPE = NOLOAD
-   {
+    /* Uncomment the section below if calling the IQNasin() or IQasin()
+       functions from the IQMath.lib library in order to utilize the
+       relevant IQ Math table in Boot ROM (This saves space and Boot ROM
+       is 1 wait-state). If this section is not uncommented, IQmathTables2
+       will be loaded into other memory (SARAM, Flash, etc.) and will take
+       up space, but 0 wait-state is possible.
+    */
+    /*
+    IQmathTables3    : > IQTABLES3, PAGE = 0, TYPE = NOLOAD
+    {
 
-              IQmath.lib<IQNasinTable.obj> (IQmathTablesRam)
+               IQmath.lib<IQNasinTable.obj> (IQmathTablesRam)
 
-   }
-   */
+    }
+    */
 
    /* .reset is a standard section used by the compiler.  It contains the */
    /* the address of the start of _c_int00 for C Code.   /*
@@ -230,3 +212,4 @@ SECTIONS
 // End of file.
 //===========================================================================
 */
+

@@ -9,3 +9,11 @@
 #include "Canbus_Bootloader.h"
 
 
+/**
+* \brief función de inicialización del periférico de CANBUS.
+* contains CANBUS clocks and peripheral initializations needed for the bootloader to work.
+*
+*/
+void initCanbus(void){
+
+}

@@ -10,7 +10,7 @@
 #define INCLUDES_FLASHHANDLING_BOOTLOADER_H_
 
 
-
+void initFLASHhandling(void);
 
 
 #endif /* INCLUDES_FLASHHANDLING_BOOTLOADER_H_ */

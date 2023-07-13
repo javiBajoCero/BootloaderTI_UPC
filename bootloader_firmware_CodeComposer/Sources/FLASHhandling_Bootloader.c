@@ -8,3 +8,11 @@
 #include "FLASHhandling_Bootloader.h"
 
 
+/**
+* \brief funcion de inicialización del FLASH memory handler.
+* contains función de inicialización de estructuras y variables para la programación de la memoria FLASH.
+*
+*/
+void initFLASHhandling(void){
+
+}

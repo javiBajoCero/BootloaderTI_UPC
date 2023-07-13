@@ -10,7 +10,7 @@
 #define INCLUDES_SYSTICK_BOOTLAODER_H_
 
 
-
+void initSystick(void);
 
 
 #endif /* INCLUDES_SYSTICK_BOOTLAODER_H_ */

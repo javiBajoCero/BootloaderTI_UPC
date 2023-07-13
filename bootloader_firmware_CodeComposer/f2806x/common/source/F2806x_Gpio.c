@@ -68,7 +68,9 @@ InitGpio(void)
     GpioCtrlRegs.GPAMUX2.all = 0x0000;    // GPIO functionality GPIO16-GPIO31
     GpioCtrlRegs.GPBMUX1.all = 0x0000;    // GPIO functionality GPIO32-GPIO47
     GpioCtrlRegs.GPBMUX2.all = 0x0000;	  // GPIO functionality GPIO48-GPIO63
-    
+        //javi canbus pins
+        GpioCtrlRegs.GPAMUX2.bit.GPIO30=0x01; //seleccionada funcion 1 CANRXA,  page 150: (I) https://www.ti.com/lit/ds/symlink/tms320f28069m.pdf?ts=1689236797240&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FTMS320F28069M
+        GpioCtrlRegs.GPAMUX2.bit.GPIO31=0x01; //seleccionada funcion 1 CANTXA,
     //
     // Dig.IO funct. applies to AIO2,4,6,10,12,14
     //
@@ -77,6 +79,9 @@ InitGpio(void)
     GpioCtrlRegs.GPADIR.all = 0x0000;    // GPIO0-GPIO31 are GP inputs
     GpioCtrlRegs.GPBDIR.all = 0x0000;    // GPIO32-GPIO63 are inputs
     
+        //javi
+        GpioDataRegs.GPBSET.bit.GPIO39    = 0x01;      //sets GPIO , turns off the LED (LED is active LOW)
+        GpioCtrlRegs.GPBDIR.bit.GPIO39    = 0x01;      // GPIO39 LED is output
     //
     // AIO2,4,6,10,12,14 are digital inputs
     //
@@ -96,10 +101,12 @@ InitGpio(void)
     //
     // Pull-ups can be enabled or disabled.
     //
-    GpioCtrlRegs.GPAPUD.all = 0x0000;      // Pullup's enabled GPIO0-GPIO31
-    GpioCtrlRegs.GPBPUD.all = 0x0000;      // Pullup's enabled GPIO32-GPIO44
-    //GpioCtrlRegs.GPAPUD.all = 0xFFFF;    // Pullup's disabled GPIO0-GPIO31
-    //GpioCtrlRegs.GPBPUD.all = 0xFFFF;    // Pullup's disabled GPIO32-GPIO44
+    //    GpioCtrlRegs.GPAPUD.all = 0x0000;      // Pullup's enabled GPIO0-GPIO31
+    //    GpioCtrlRegs.GPBPUD.all = 0x0000;      // Pullup's enabled GPIO32-GPIO44
+    GpioCtrlRegs.GPAPUD.all = 0xFFFF;    // Pullup's disabled GPIO0-GPIO31
+    GpioCtrlRegs.GPBPUD.all = 0xFFFF;    // Pullup's disabled GPIO32-GPIO44
+        //javi
+    GpioCtrlRegs.GPBPUD.bit.GPIO39 = 0x1;    // Pullup's enabled for LED GPIO34 (LED is active LOW)
     EDIS;
 }
 

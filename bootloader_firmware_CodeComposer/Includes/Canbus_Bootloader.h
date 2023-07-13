@@ -11,6 +11,7 @@
 
 
 
+void initCanbus(void);
 
 
 #endif /* INCLUDES_CANBUS_BOOTLOADER_H_ */

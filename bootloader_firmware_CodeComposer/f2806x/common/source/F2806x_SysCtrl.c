@@ -89,11 +89,12 @@ InitSysCtrl(void)
     // See the device data manual and/or the ADC Reference
     // Manual for more information.
     //
-    EALLOW;
-    SysCtrlRegs.PCLKCR0.bit.ADCENCLK = 1; // Enable ADC peripheral clock
-    (*Device_cal)();
-    SysCtrlRegs.PCLKCR0.bit.ADCENCLK = 0; // Return ADC clock to original state
-    EDIS;
+        //javi, commented out, we are not using ADC in the bootloader
+        //    EALLOW;
+        //    SysCtrlRegs.PCLKCR0.bit.ADCENCLK = 1; // Enable ADC peripheral clock
+        //    (*Device_cal)();
+        //    SysCtrlRegs.PCLKCR0.bit.ADCENCLK = 0; // Return ADC clock to original state
+        //    EDIS;
 
     //
     // Select Internal Oscillator 1 as Clock Source (default), and turn off all
@@ -393,52 +394,52 @@ InitPeripheralClocks(void)
     //
     // This function is not written to be an example of efficient code.
     //
-    SysCtrlRegs.PCLKCR1.bit.EPWM1ENCLK = 1;    // ePWM1
-    SysCtrlRegs.PCLKCR1.bit.EPWM2ENCLK = 1;    // ePWM2
-    SysCtrlRegs.PCLKCR1.bit.EPWM3ENCLK = 1;    // ePWM3
-    SysCtrlRegs.PCLKCR1.bit.EPWM4ENCLK = 1;    // ePWM4
-    SysCtrlRegs.PCLKCR1.bit.EPWM5ENCLK = 1;    // ePWM5
-    SysCtrlRegs.PCLKCR1.bit.EPWM6ENCLK = 1;    // ePWM6
-    SysCtrlRegs.PCLKCR1.bit.EPWM7ENCLK = 1;    // ePWM7
-    SysCtrlRegs.PCLKCR1.bit.EPWM8ENCLK = 1;    // ePWM8
+    SysCtrlRegs.PCLKCR1.bit.EPWM1ENCLK = 0;    // ePWM1
+    SysCtrlRegs.PCLKCR1.bit.EPWM2ENCLK = 0;    // ePWM2
+    SysCtrlRegs.PCLKCR1.bit.EPWM3ENCLK = 0;    // ePWM3
+    SysCtrlRegs.PCLKCR1.bit.EPWM4ENCLK = 0;    // ePWM4
+    SysCtrlRegs.PCLKCR1.bit.EPWM5ENCLK = 0;    // ePWM5
+    SysCtrlRegs.PCLKCR1.bit.EPWM6ENCLK = 0;    // ePWM6
+    SysCtrlRegs.PCLKCR1.bit.EPWM7ENCLK = 0;    // ePWM7
+    SysCtrlRegs.PCLKCR1.bit.EPWM8ENCLK = 0;    // ePWM8
 
-    SysCtrlRegs.PCLKCR0.bit.HRPWMENCLK = 1;    // HRPWM
-    SysCtrlRegs.PCLKCR0.bit.TBCLKSYNC = 1;     // Enable TBCLK within the ePWM
+    SysCtrlRegs.PCLKCR0.bit.HRPWMENCLK = 0;    // HRPWM
+    SysCtrlRegs.PCLKCR0.bit.TBCLKSYNC = 0;     // Enable TBCLK within the ePWM
 
-    SysCtrlRegs.PCLKCR1.bit.EQEP1ENCLK = 1;    // eQEP1
-    SysCtrlRegs.PCLKCR1.bit.EQEP2ENCLK = 1;    // eQEP2
+    SysCtrlRegs.PCLKCR1.bit.EQEP1ENCLK = 0;    // eQEP1
+    SysCtrlRegs.PCLKCR1.bit.EQEP2ENCLK = 0;    // eQEP2
 
-    SysCtrlRegs.PCLKCR1.bit.ECAP1ENCLK = 1;    // eCAP1
-    SysCtrlRegs.PCLKCR1.bit.ECAP2ENCLK = 1;    // eCAP2
-    SysCtrlRegs.PCLKCR1.bit.ECAP3ENCLK = 1;    // eCAP3
+    SysCtrlRegs.PCLKCR1.bit.ECAP1ENCLK = 0;    // eCAP1
+    SysCtrlRegs.PCLKCR1.bit.ECAP2ENCLK = 0;    // eCAP2
+    SysCtrlRegs.PCLKCR1.bit.ECAP3ENCLK = 0;    // eCAP3
 
-    SysCtrlRegs.PCLKCR2.bit.HRCAP1ENCLK = 1;   // HRCAP1
-    SysCtrlRegs.PCLKCR2.bit.HRCAP2ENCLK = 1;   // HRCAP2
-    SysCtrlRegs.PCLKCR2.bit.HRCAP3ENCLK = 1;   // HRCAP3
-    SysCtrlRegs.PCLKCR2.bit.HRCAP4ENCLK = 1;   // HRCAP4
+    SysCtrlRegs.PCLKCR2.bit.HRCAP1ENCLK = 0;   // HRCAP1
+    SysCtrlRegs.PCLKCR2.bit.HRCAP2ENCLK = 0;   // HRCAP2
+    SysCtrlRegs.PCLKCR2.bit.HRCAP3ENCLK = 0;   // HRCAP3
+    SysCtrlRegs.PCLKCR2.bit.HRCAP4ENCLK = 0;   // HRCAP4
 
-    SysCtrlRegs.PCLKCR0.bit.ADCENCLK = 1;      // ADC
-    SysCtrlRegs.PCLKCR3.bit.COMP1ENCLK = 1;    // COMP1
-    SysCtrlRegs.PCLKCR3.bit.COMP2ENCLK = 1;    // COMP2
-    SysCtrlRegs.PCLKCR3.bit.COMP3ENCLK = 1;    // COMP3
+    SysCtrlRegs.PCLKCR0.bit.ADCENCLK = 0;      // ADC
+    SysCtrlRegs.PCLKCR3.bit.COMP1ENCLK = 0;    // COMP1
+    SysCtrlRegs.PCLKCR3.bit.COMP2ENCLK = 0;    // COMP2
+    SysCtrlRegs.PCLKCR3.bit.COMP3ENCLK = 0;    // COMP3
 
-    SysCtrlRegs.PCLKCR3.bit.CPUTIMER0ENCLK = 1; // CPU Timer 0
-    SysCtrlRegs.PCLKCR3.bit.CPUTIMER1ENCLK = 1; // CPU Timer 1
-    SysCtrlRegs.PCLKCR3.bit.CPUTIMER2ENCLK = 1; // CPU Timer 2
+    SysCtrlRegs.PCLKCR3.bit.CPUTIMER0ENCLK = 1; // CPU Timer 0 //javi enabled TIM0 for systick
+    SysCtrlRegs.PCLKCR3.bit.CPUTIMER1ENCLK = 0; // CPU Timer 1
+    SysCtrlRegs.PCLKCR3.bit.CPUTIMER2ENCLK = 0; // CPU Timer 2
 
-    SysCtrlRegs.PCLKCR3.bit.DMAENCLK = 1;      // DMA
+    SysCtrlRegs.PCLKCR3.bit.DMAENCLK = 0;      // DMA
 
-    SysCtrlRegs.PCLKCR3.bit.CLA1ENCLK = 1;     // CLA1
+    SysCtrlRegs.PCLKCR3.bit.CLA1ENCLK = 0;     // CLA1
 
-    SysCtrlRegs.PCLKCR3.bit.USB0ENCLK = 1;	   // USB0 
+    SysCtrlRegs.PCLKCR3.bit.USB0ENCLK = 0;	   // USB0
 
-    SysCtrlRegs.PCLKCR0.bit.I2CAENCLK = 1;     // I2C-A
-    SysCtrlRegs.PCLKCR0.bit.SPIAENCLK = 1;     // SPI-A
-    SysCtrlRegs.PCLKCR0.bit.SPIBENCLK = 1;     // SPI-B
-    SysCtrlRegs.PCLKCR0.bit.SCIAENCLK = 1;     // SCI-A
-    SysCtrlRegs.PCLKCR0.bit.SCIBENCLK = 1;     // SCI-B
-    SysCtrlRegs.PCLKCR0.bit.MCBSPAENCLK = 1;   // McBSP-A
-    SysCtrlRegs.PCLKCR0.bit.ECANAENCLK=1;      // eCAN-A
+    SysCtrlRegs.PCLKCR0.bit.I2CAENCLK = 0;     // I2C-A
+    SysCtrlRegs.PCLKCR0.bit.SPIAENCLK = 0;     // SPI-A
+    SysCtrlRegs.PCLKCR0.bit.SPIBENCLK = 0;     // SPI-B
+    SysCtrlRegs.PCLKCR0.bit.SCIAENCLK = 0;     // SCI-A
+    SysCtrlRegs.PCLKCR0.bit.SCIBENCLK = 0;     // SCI-B
+    SysCtrlRegs.PCLKCR0.bit.MCBSPAENCLK = 0;   // McBSP-A
+    SysCtrlRegs.PCLKCR0.bit.ECANAENCLK=1;      // eCAN-A //javi enabled Canbus peripheral clock
 
     SysCtrlRegs.PCLKCR0.bit.TBCLKSYNC = 1;     // Enable TBCLK within the ePWM
 
