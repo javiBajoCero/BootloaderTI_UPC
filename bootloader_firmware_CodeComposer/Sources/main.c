@@ -21,8 +21,7 @@ int main(void)
 // Step 3. Initialize PIE vector table:
     // The PIE vector table is initialized with pointers to shell Interrupt
     // Service Routines (ISR).
-    // Insert user specific ISR code in the appropriate shell ISR routine in
-    // the F2806x_DefaultIsr.c file.
+    // Insert user specific ISR code in the appropriate shell ISR routine .
 
     // Disable and clear all CPU interrupts:
     DINT;
@@ -46,12 +45,14 @@ int main(void)
     initFLASHhandling();
     initCanbus();
     initBootloader();
-    Uint32 time=0;
+
+// Step 5. Enable Interrupts:
+    // Enable global Interrupts and higher priority real-time debug events:
+    EINT;     // Enable Global interrupt INTM (just in case it wasnt enabled already)
+    ERTM;     // Enable Global realtime interrupt DBGM
+
+//Superloop
     while(1){
-        //stateMachineBootloader();
-        if(getTick()-time>100){
-            GpioDataRegs.GPBTOGGLE.bit.GPIO39=0x01; //Toggles blue LED D10 (debugging)
-            time=getTick();
-        }
+        stateMachineBootloader();
     }
 }

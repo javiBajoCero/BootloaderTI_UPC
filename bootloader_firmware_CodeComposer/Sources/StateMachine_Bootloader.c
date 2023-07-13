@@ -15,15 +15,28 @@
 //
 STATEMACHINE_struct state_StateMachine={st_wait,0x00,0x00};
 
+//timestamps for Tick timeouts
+const Uint32 twoAndAhalfSeconds= 2500; //seconds
+Uint32 timestamp=0;
+
+
 /**
-* \brief Contiene todas las funciones de inicialización.
-* contains all clocks and peripheral initializations needed for the bootloader to work.
+* \brief Escucha CANBUs durante 2,5segundos
+* si recibe
 *
 */
 void initBootloader(void){
-    initSystick();
-    initFLASHhandling();
-    initCanbus();
+    timestamp=getTick();
+    while(getTick()-timestamp<twoAndAhalfSeconds){//listen for incomming valid CANBUS frames for 2,5 seconds
+//        if(){//if valid CANBUS ID and data, , the state machine should expect to receive some data.
+//            state_StateMachine.step=st_wait;
+//            break;
+//        }
+
+    }
+
+    //if we reached this point 2,5seconds passed with no valid CANBUS, the state machine should jump straight to app.
+    state_StateMachine.step=st_go;
 }
 
 /**
@@ -32,6 +45,27 @@ void initBootloader(void){
 *
 */
 void stateMachineBootloader(void){
+
+    switch (state_StateMachine.step) {
+        case st_wait:
+
+            break;
+        case st_erase:
+
+            break;
+        case st_write:
+
+            break;
+        case st_go:
+
+            break;
+        case st_error:
+
+            break;
+        default:
+            break;
+    }
+
 
 }
 

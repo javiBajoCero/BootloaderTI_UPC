@@ -11,6 +11,6 @@
 
 
 void initFLASHhandling(void);
-
+void calculateCRCfromFLASHdata(void);
 
 #endif /* INCLUDES_FLASHHANDLING_BOOTLOADER_H_ */

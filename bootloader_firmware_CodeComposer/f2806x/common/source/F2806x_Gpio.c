@@ -107,6 +107,9 @@ InitGpio(void)
     GpioCtrlRegs.GPBPUD.all = 0xFFFF;    // Pullup's disabled GPIO32-GPIO44
         //javi
     GpioCtrlRegs.GPBPUD.bit.GPIO39 = 0x1;    // Pullup's enabled for LED GPIO34 (LED is active LOW)
+    GpioCtrlRegs.GPAPUD.bit.GPIO30 = 0x1;    // Pullup's enabled for CANRX
+    GpioCtrlRegs.GPAPUD.bit.GPIO31 = 0x1;    // Pullup's enabled for CANTX
+
     EDIS;
 }
 

@@ -16,3 +16,12 @@
 void initFLASHhandling(void){
 
 }
+
+/**
+* \brief calcula CRC de los datos recibidos
+* Calcula el CRC(32bits) de 4 posiciones de memoria de programa.
+*
+*/
+void calculateCRCfromFLASHdata(void){
+
+}
