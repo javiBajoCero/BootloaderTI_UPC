@@ -22,7 +22,7 @@ Uint32 systemtick=0;
 *
 */
 interrupt void interrupt_systick(void){
-    GpioDataRegs.GPBTOGGLE.bit.GPIO39=0x01; //Toggles blue LED D10 (debugging)
+    //GpioDataRegs.GPBTOGGLE.bit.GPIO39=0x01; //Toggles blue LED D10 (debugging)
     systemtick++;                           //adds +1 to system tick
     PieCtrlRegs.PIEACK.all= PIEACK_GROUP1;
 }

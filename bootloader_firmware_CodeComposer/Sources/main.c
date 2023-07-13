@@ -46,8 +46,12 @@ int main(void)
     initFLASHhandling();
     initCanbus();
     initBootloader();
-
+    Uint32 time=0;
     while(1){
-        stateMachineBootloader();
+        //stateMachineBootloader();
+        if(getTick()-time>100){
+            GpioDataRegs.GPBTOGGLE.bit.GPIO39=0x01; //Toggles blue LED D10 (debugging)
+            time=getTick();
+        }
     }
 }
