@@ -46,6 +46,21 @@
 #include "F2806x_Device.h"     // F2806x Headerfile Include File
 #include "F2806x_Examples.h"   // F2806x Examples Include File
 
+//javi
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                                    // CAN Baud Rate = (SYSCLKOUT/2) / ((BRPREG+1)*(TSEG1REG+TSEG2REG+3))
+#define CANA_BPR                            (Uint16)11      // Baud Rate Prescaler: defines the CAN base clock (SYSCLKOUT/2)/(CANA_BPR+1), the clock of the time quanta (TQ)
+#define CANA_TSEG_1                         (Uint16)11      // Defines the first segment (CANA_TSEG_1+1)
+#define CANA_TSEG_2                         (Uint16)1       // Defines the second segment (CANA_TSEG_2+1)
+//sampling point in PU (1 + (CANA_TSEG_1+1)) / (1 + (CANA_TSEG_1+1) + (CANA_TSEG_2+1))
+//Examples for 90 MHz SYSCLKOUT:
+//BaudRate  BPR TSEG_1  TSEG_2  SP      Recommended. SP
+//1000kbs   2   11      1       86.7%   87.5%
+//500kbs    5   11      1       86.7%   87.5%
+//250kbs    11  11      1       86.7%   87.5%
+//125kbs    44  4       1       75.0%   87.5%
+//more info and calculator: http://www.bittiming.can-wiki.info
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // InitECan - This function initializes the eCAN module to a known state.
 //
@@ -151,9 +166,9 @@ InitECana(void)
     // (45 MHz CAN module clock Bit rate = 1 Mbps)
     // See Note at end of file.
         //javi calculated using this excel http://www.ti.com/lit/zip/sprac35
-    ECanaShadow.CANBTC.bit.BRPREG = 11; //250Kbps
-    ECanaShadow.CANBTC.bit.TSEG2REG = 5;
-    ECanaShadow.CANBTC.bit.TSEG1REG = 7;
+    ECanaShadow.CANBTC.bit.BRPREG = CANA_BPR; //250Kbps
+    ECanaShadow.CANBTC.bit.TSEG2REG = CANA_TSEG_2;
+    ECanaShadow.CANBTC.bit.TSEG1REG = CANA_TSEG_1;
 
     ECanaRegs.CANBTC.all = ECanaShadow.CANBTC.all;
 

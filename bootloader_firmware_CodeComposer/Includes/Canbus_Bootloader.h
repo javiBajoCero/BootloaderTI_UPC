@@ -68,6 +68,7 @@ struct CAN_MBox {
 
 
 void initCanbus(void);
-void Send_MBox_CANA (union CAN_Data *d, unsigned int i);
+void sendHeartbeat_canbus(union CAN_Data *d);
+void sendDATA_canbus(union CAN_Data *d);
 
 #endif /* INCLUDES_CANBUS_BOOTLOADER_H_ */

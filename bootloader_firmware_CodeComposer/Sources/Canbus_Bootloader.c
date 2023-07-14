@@ -5,57 +5,127 @@
  *  \version   0.0
  *  \date      Jul 10, 2023
  */
-#include "F2806x_Device.h"               //already provided TI functions / register definitiions and utilities, specific to this TMS320F28069M device
+#include "F2806x_Device.h"                           //already provided TI functions / register definitiions and utilities, specific to this TMS320F28069M device
 #include "F2806x_GlobalPrototypes.h"
 
 #include "Canbus_Bootloader.h"
 
-#define TRUE            1
-#define FALSE           0
+#define TRUE                        (Uint16) 1
+#define FALSE                       (Uint16) 0
 
-#define SENDBUFFER_SIZE                     8
-#define RECVBUFFER_SIZE                     8
-#define RECVBUFFER_OWERFLOWMASK             0x7
-#define SENDBUFFER_OWERFLOWMASK             0x7
+//mailboxes defines, las configuran asi y no se modifican ni los ID ni DLC en todo el programa
+#define MBN_RECV_HB                     (Uint16) 31         //numero de CANBUS mailbox que se usa para recibir heartbeat
+#define canbusADDR_MBN_RECV_HB          (Uint32) 0x00000702 //extended addr de canbus para recibir heartbeat
 
-// CAN Baud Rate = (SYSCLKOUT/2) / ((BRPREG+1)*(TSEG1REG+TSEG2REG+3))
-#define CANA_BPR                            11  // Baud Rate Prescaler: defines the CAN base clock (SYSCLKOUT/2)/(CANA_BPR+1), the clock of the time quanta (TQ)
-#define CANA_TSEG_1                         11  // Defines the first segment (CANA_TSEG_1+1)
-#define CANA_TSEG_2                         1   // Defines the second segment (CANA_TSEG_2+1)
-//sampling point in PU (1 + (CANA_TSEG_1+1)) / (1 + (CANA_TSEG_1+1) + (CANA_TSEG_2+1))
-//Examples for 90 MHz SYSCLKOUT:
-//BaudRate  BPR TSEG_1  TSEG_2  SP      Recommended. SP
-//1000kbs   2   11      1       86.7%   87.5%
-//500kbs    5   11      1       86.7%   87.5%
-//250kbs    11  11      1       86.7%   87.5%
-//125kbs    44  4       1       75.0%   87.5%
-//more info and calculator: http://www.bittiming.can-wiki.info
+#define MBN_RECV_DATA                   (Uint16) 30         //numero de CANBUS mailbox que se usa para recibir data
+#define canbusADDR_MBN_RECV_DATA        (Uint32) 0x00000802 //extended addr de canbus para recibir data
 
-#define ECANA_MODE                          1   // 1--> eCAN_MOde, 0 --> SCC_Mode
-#define LSB_CANA_L_first                    0   // 1--> LSB of CAN_L, 0--> MSB of CAN_H
-#define MAX_POS_DATA_NEED                   8
+#define MBN_SEND_HB                     (Uint16) 15         //numero de CANBUS mailbox que se usa para enviar HEARTBEAT
+#define canbusADDR_MBN_SEND_HB          (Uint32) 0x00000703 //extended addr de canbus para enviar heartbeat
+#define datalengthinbytes_MBN_SEND_HB   (Uint16) 4          //numero de bytes de datos a enviar con cada mensaje de heartbeat
 
-// MBox numbers map
-#define MBN_RECV_HB                     31
-#define MBN_RECV_DATA                   30
+#define MBN_SEND_DATA                   (Uint16) 14         //numero de CANBUS mailbox que se usa para enviar data
+#define canbusADDR_MBN_SEND_DATA        (Uint32) 0x00000803 //extended addr de canbus para enviar data
+#define datalengthinbytes_MBN_SEND_DATA (Uint16) 1          //numero de bytes de datos a enviar con cada mensaje de data
 
-// Mapa de objetos - LBP
-#define MBN_SEND_HB                     15
-#define MBN_SEND_DATA                   14
+#define mailboxesAcceptanceMasks        (Uint32) 0xFFFFF000
 
-#define MBN_RECV_FIRST                  30
-#define MBN_RECV_LAST                   31
-
-#define MBN_SEND_FIRST                  14
-#define MBN_SEND_LAST                   15      // 31 has the highest transmit priority
 
 
 struct CAN_MBox mbSend;          //canbus transmitting mailboxes
 struct CAN_MBox mbRecv;          //canbus receiving mailboxes
 
 
+//todas las definiciones de las funciones de este .c , asi son accesibles entre ellas localmente
+void initCanbus(void);
+void configMailboxTXCanbus(void);
+void configMailboxRXCanbus(void);
+void Config_MBox_CANA (struct CAN_MBox *mb);
+void Send_MBox_CANA (union CAN_Data *d, Uint32 i);
+void sendHeartbeat_canbus(union CAN_Data *d);
+void sendDATA_canbus(union CAN_Data *d);
 
 
+/**
+* \brief función de inicialización del periférico de CANBUS.
+* contains CANBUS clocks and peripheral initializations needed for the bootloader to work.
+*
+*/
+void initCanbus(void){              // code inspired from "G:\Shared drives\CITCEA.PRJ_190_EVARM_COHVE\06. documentacio tecnica\7. Disseny software\Noves Implementacions\Bootloader\Projectes Bootloader CAN" CME_firmware_Bootloader/source/CAN_boot.c
+    InitECana();                    // function already provided by F2806x_ECan.c, only changed the speed bit quantas for 250kbps
+    configMailboxRXCanbus();
+    configMailboxTXCanbus();
+}
+
+/**
+* \brief configuration of CANBUS TX mailboxes
+*
+*
+*/
+void configMailboxTXCanbus(void){//https://www.ti.com/lit/ug/sprueu0/sprueu0.pdf?ts=1689326497046&ref_url=https%253A%252F%252Fwww.google.com%252F
+    // ========= Configure the Transmit MailBoxes ========= //
+    // Common parameters for all the transmit MailBoxes
+    mbSend.Direction                    = CAN_TRANSMIT;
+    mbSend.ExtendedCAN                  = TRUE;
+    mbSend.Enable                       = TRUE;
+    mbSend.RemoteTranssmisionRequest    = FALSE;
+    mbSend.AutoAnswerMode               = FALSE;
+    mbSend.AcceptanceMaskEnable         = TRUE;
+    mbSend.InterruptMask                = FALSE;
+    mbSend.OverWriteProtect             = FALSE;
+    mbSend.TimeOutEnable                = TRUE;
+    mbSend.TimeOut                      = 10000;                 // 10000 a 250Kbs = 40ms
+
+    // Additional parameters for some transmit MailBoxes
+
+    mbSend.Number           = MBN_SEND_HB;
+    mbSend.TransmitPriority = MBN_SEND_HB;
+    mbSend.Identifier       = canbusADDR_MBN_SEND_HB;
+    mbSend.AcceptanceMask   = mailboxesAcceptanceMasks;
+    mbSend.DataLength       = datalengthinbytes_MBN_SEND_HB;
+    Config_MBox_CANA(&(mbSend));                                // Execute the mailbox configuration
+
+    mbSend.Number           = MBN_SEND_DATA;
+    mbSend.TransmitPriority = MBN_SEND_DATA;
+    mbSend.Identifier       = canbusADDR_MBN_SEND_DATA;
+    mbSend.AcceptanceMask   = mailboxesAcceptanceMasks;
+    mbSend.DataLength       = datalengthinbytes_MBN_SEND_DATA;
+    Config_MBox_CANA(&(mbSend));                                // Execute the mailbox configuration
+}
+
+/**
+* \brief configuration of CANBUS RX mailboxes
+*
+*
+*/
+void configMailboxRXCanbus(void){                               //https://www.ti.com/lit/ug/sprueu0/sprueu0.pdf?ts=1689326497046&ref_url=https%253A%252F%252Fwww.google.com%252F
+
+    // ========= Configure the Receive MailBoxes ========= //
+    // Common parameters for all the receive MailBoxes
+
+    mbRecv.Direction                = CAN_RECEIVE;
+    mbRecv.ExtendedCAN              = TRUE;
+    mbRecv.Enable                   = TRUE;
+    mbRecv.RemoteTranssmisionRequest= FALSE;
+    mbRecv.AutoAnswerMode           = FALSE;
+    mbRecv.AcceptanceMask           = TRUE;
+    mbRecv.AcceptanceMaskEnable     = TRUE;
+    mbRecv.InterruptMask            = TRUE;
+    mbRecv.InterruptLowPriority     = TRUE;
+    mbRecv.OverWriteProtect         = FALSE;
+    mbRecv.TimeOutEnable            = FALSE;
+
+    // Additional parameters for some receive MailBoxes
+    mbRecv.Number           = MBN_RECV_HB;
+    mbRecv.Identifier       = canbusADDR_MBN_RECV_HB;
+    mbRecv.AcceptanceMask   = mailboxesAcceptanceMasks;
+    Config_MBox_CANA(&(mbRecv));                                // Executes the mailbox configuration
+
+    mbRecv.Number           = MBN_RECV_DATA;
+    mbRecv.Identifier       = canbusADDR_MBN_RECV_DATA;
+    mbRecv.AcceptanceMask   = mailboxesAcceptanceMasks;
+    Config_MBox_CANA(&(mbRecv));                                // Executes the mailbox configuration
+}
 
 /**
 * \brief Configures the MailBox indicated from CANA
@@ -175,97 +245,16 @@ void Config_MBox_CANA (struct CAN_MBox *mb) {
 }
 
 
-/**
-* \brief configuration of CANBUS TX mailboxes
-*
-*
-*/
-void configMailboxTXCanbus(void){//https://www.ti.com/lit/ug/sprueu0/sprueu0.pdf?ts=1689326497046&ref_url=https%253A%252F%252Fwww.google.com%252F
-    Uint32 i=0; //used localy for the loop
-    // ========= Configure the Transmit MailBoxes ========= //
-    // Common parameters for all the transmit MailBoxes
-    mbSend.Direction = CAN_TRANSMIT;
-    mbSend.ExtendedCAN = TRUE;
-    mbSend.Enable = TRUE;
-    mbSend.RemoteTranssmisionRequest = FALSE;
-    mbSend.AutoAnswerMode = FALSE;
-    mbSend.AcceptanceMaskEnable = TRUE;
-    mbSend.InterruptMask = FALSE;
-    mbSend.OverWriteProtect = FALSE;
-    mbSend.TimeOutEnable = TRUE;
-    mbSend.TimeOut = 10000;         // 10000 a 1Mbs = 10ms
 
-    // Additional parameters for some transmit MailBoxes
-    for (i = MBN_SEND_FIRST; i <= MBN_SEND_LAST; i++) {
-        mbSend.Number = i;
-        mbSend.TransmitPriority = i;
-
-        switch (i) {
-        case MBN_SEND_HB:
-            mbSend.Identifier = 0x00000703;
-            mbSend.AcceptanceMask = 0xFFFFF000;
-            mbSend.DataLength = 4;
-            break;
-        case MBN_SEND_DATA:
-            mbSend.Identifier = 0x00000803;
-            mbSend.AcceptanceMask = 0xFFFFF000;
-            mbSend.DataLength = 1;
-            break;
-        default:
-            break;
-        }
-        Config_MBox_CANA(&(mbSend));    // Execute the mailbox configuration
-    }
-}
-
-/**
-* \brief configuration of CANBUS RX mailboxes
-*
-*
-*/
-void configMailboxRXCanbus(void){//https://www.ti.com/lit/ug/sprueu0/sprueu0.pdf?ts=1689326497046&ref_url=https%253A%252F%252Fwww.google.com%252F
-    Uint32 i=0; //used localy for the loop
-    // ========= Configure the Receive MailBoxes ========= //
-    // Common parameters for all the receive MailBoxes
-    mbRecv.Direction = CAN_RECEIVE;
-    mbRecv.ExtendedCAN = TRUE;
-    mbRecv.Enable = TRUE;
-    mbRecv.RemoteTranssmisionRequest = FALSE;
-    mbRecv.AutoAnswerMode = FALSE;
-    mbRecv.AcceptanceMask = TRUE;
-    mbRecv.AcceptanceMaskEnable = TRUE;
-    mbRecv.InterruptMask = TRUE;
-    mbRecv.InterruptLowPriority = TRUE;
-    mbRecv.OverWriteProtect = FALSE;
-    mbRecv.TimeOutEnable = FALSE;
-
-    // Additional parameters for some receive MailBoxes
-    for (i = MBN_RECV_FIRST; i <= MBN_RECV_LAST; i++) {
-        mbRecv.Number = i;
-        switch (i) {
-        case MBN_RECV_HB:
-            mbRecv.Identifier = 0x00000702;
-            mbRecv.AcceptanceMask = 0xFFFFF000;
-            break;
-        case MBN_RECV_DATA:
-            mbRecv.Identifier = 0x00000802;
-            mbRecv.AcceptanceMask = 0xFFFFF000;
-            break;
-        default:
-            break;
-        }
-        Config_MBox_CANA(&(mbRecv));    // Executes the mailbox configuration
-    }
-}
 
 /**
 * \brief Send a determinate MailBox info through CANA
-*
+* por algun motivo las mailboxes se usan con una unica e ininmutable dirección de canbus, por cada dirección de canbus diferente que se quiera usar se ocupa un mailbox diferente
 *
 */
-void Send_MBox_CANA (union CAN_Data *d, unsigned int i) {
+void Send_MBox_CANA (union CAN_Data *d, Uint32 i) {
     volatile struct MBOX *HardwareMBox;
-    unsigned long Mask = (Uint32)(1<<(i));
+    Uint32 Mask = (Uint32)((Uint32)1<<(i));
     struct ECAN_REGS ECanaShadow;
 
     // It copies the dates from the software variable to hardware variable
@@ -282,18 +271,14 @@ void Send_MBox_CANA (union CAN_Data *d, unsigned int i) {
     ECanaShadow.CANTRS.all = ECanaRegs.CANTRS.all;
     ECanaShadow.CANTRS.all |= Mask;
     ECanaRegs.CANTRS.all = ECanaShadow.CANTRS.all;
+}
 
-//  counter_CAN_tx++;       // New transmitted CAN Message
+void sendHeartbeat_canbus(union CAN_Data *d){
+    Send_MBox_CANA(d, MBN_SEND_HB);
+}
+
+void sendDATA_canbus(union CAN_Data *d){
+    Send_MBox_CANA(d, MBN_SEND_DATA);
 }
 
 
-/**
-* \brief función de inicialización del periférico de CANBUS.
-* contains CANBUS clocks and peripheral initializations needed for the bootloader to work.
-*
-*/
-void initCanbus(void){// code inspired from "G:\Shared drives\CITCEA.PRJ_190_EVARM_COHVE\06. documentacio tecnica\7. Disseny software\Noves Implementacions\Bootloader\Projectes Bootloader CAN" CME_firmware_Bootloader/source/CAN_boot.c
-    InitECana();// function already provided by F2806x_ECan.c, only changed the speed bit quantas for 250kbps
-    configMailboxRXCanbus();
-    configMailboxTXCanbus();
-}
