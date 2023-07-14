@@ -95,6 +95,8 @@ InitGpio(void)
     //
     GpioCtrlRegs.GPAQSEL1.all = 0x0000;   // GPIO0-GPIO15 Synch to SYSCLKOUT
     GpioCtrlRegs.GPAQSEL2.all = 0x0000;   // GPIO16-GPIO31 Synch to SYSCLKOUT
+        //javi
+        GpioCtrlRegs.GPAQSEL2.bit.GPIO30 = 3;           // Asynch qual for GPIO30 (CANRXA)
     GpioCtrlRegs.GPBQSEL1.all = 0x0000;   // GPIO32-GPIO47 Synch to SYSCLKOUT
     GpioCtrlRegs.GPBQSEL2.all = 0x0000;	  // GPIO48-GPIO63 Synch to SYSCLKOUT
 
@@ -106,9 +108,9 @@ InitGpio(void)
     GpioCtrlRegs.GPAPUD.all = 0xFFFF;    // Pullup's disabled GPIO0-GPIO31
     GpioCtrlRegs.GPBPUD.all = 0xFFFF;    // Pullup's disabled GPIO32-GPIO44
         //javi
-    GpioCtrlRegs.GPBPUD.bit.GPIO39 = 0x1;    // Pullup's enabled for LED GPIO34 (LED is active LOW)
-    GpioCtrlRegs.GPAPUD.bit.GPIO30 = 0x1;    // Pullup's enabled for CANRX
-    GpioCtrlRegs.GPAPUD.bit.GPIO31 = 0x1;    // Pullup's enabled for CANTX
+    GpioCtrlRegs.GPBPUD.bit.GPIO39 = 0x1;    // Pullup's disabled for LED GPIO34 (LED is active LOW)
+    GpioCtrlRegs.GPAPUD.bit.GPIO30 = 0x0;    // Pullup's enabled for CANRX (0==enabled)
+    GpioCtrlRegs.GPAPUD.bit.GPIO31 = 0x0;    // Pullup's enabled for CANTX (0==enabled)
 
     EDIS;
 }

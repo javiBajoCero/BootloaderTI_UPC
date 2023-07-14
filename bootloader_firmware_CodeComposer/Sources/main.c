@@ -15,8 +15,8 @@ int main(void)
 // Step 1. Initialize System Control registers, PLL, WatchDog, Clocks to default state:
     InitSysCtrl();
 
-// Step 2. Select GPIO for the device or for the specific application:
-    InitGpio();  // Not required for this example
+// Step 2. Select GPIO for the LED and CANBUS function for canbusRX TX pins, everything else is high impedance GPIO inputs:
+    InitGpio();
 
 // Step 3. Initialize PIE vector table:
     // The PIE vector table is initialized with pointers to shell Interrupt
@@ -52,7 +52,16 @@ int main(void)
     ERTM;     // Enable Global realtime interrupt DBGM
 
 //Superloop
+    Uint32 time=getTick();
+    union CAN_Data data;
+    data.Bytes.Byte0=0xFF;
+    data.Bytes.Byte1=0xEE;
+    data.Bytes.Byte2=0xAA;
     while(1){
+        if(getTick()-time>1000){
+            Send_MBox_CANA(&data, 15);
+            time=getTick();
+        }
         stateMachineBootloader();
     }
 }

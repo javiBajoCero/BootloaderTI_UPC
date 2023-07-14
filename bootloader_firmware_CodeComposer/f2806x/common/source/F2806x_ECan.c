@@ -150,10 +150,10 @@ InitECana(void)
     // The following block is for 90 MHz SYSCLKOUT. 
     // (45 MHz CAN module clock Bit rate = 1 Mbps)
     // See Note at end of file.
-    //
-    ECanaShadow.CANBTC.bit.BRPREG = 2;
-    ECanaShadow.CANBTC.bit.TSEG2REG = 2;
-    ECanaShadow.CANBTC.bit.TSEG1REG = 10;
+        //javi calculated using this excel http://www.ti.com/lit/zip/sprac35
+    ECanaShadow.CANBTC.bit.BRPREG = 11; //250Kbps
+    ECanaShadow.CANBTC.bit.TSEG2REG = 5;
+    ECanaShadow.CANBTC.bit.TSEG1REG = 7;
 
     ECanaRegs.CANBTC.all = ECanaShadow.CANBTC.all;
 
