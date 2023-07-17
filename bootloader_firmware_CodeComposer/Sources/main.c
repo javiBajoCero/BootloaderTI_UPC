@@ -52,8 +52,14 @@ int main(void)
     ERTM;     // Enable Global realtime interrupt DBGM
 
 //Superloop
-
+    union CAN_Data a;
     while(1){
-        stateMachineBootloader();
+        a=receiveDATA_canbus();
+        if(a.newmessage_flag){
+            stateMachineBootloader();
+            a.newmessage_flag=0;
+            GpioDataRegs.GPBTOGGLE.bit.GPIO39=0x01; //Toggles blue LED D10 (debugging)
+        }
+
     }
 }

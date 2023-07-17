@@ -35,6 +35,7 @@ struct CAN_Data_Bytes {
 };
 
 union CAN_Data {
+    Uint32 newmessage_flag;                     // used when polling the mailboxes for new received messages //1 means new message.
     struct CAN_Data_Bytes   Bytes;              // 8bit words
     struct CAN_Data_Words   Words;              // 16bit words
     struct CAN_data_DWords  DWords;             // 32bit words
@@ -73,5 +74,7 @@ struct CAN_MBox {
 void initCanbus(void);
 void sendHeartbeat_canbus(union CAN_Data *d);
 void sendDATA_canbus(union CAN_Data *d);
+union CAN_Data receiveHEARTBEAT_canbus();
+union CAN_Data receiveDATA_canbus();
 
 #endif /* INCLUDES_CANBUS_BOOTLOADER_H_ */

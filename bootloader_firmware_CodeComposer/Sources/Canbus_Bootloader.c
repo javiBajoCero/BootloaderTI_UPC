@@ -16,9 +16,11 @@
 //mailboxes defines, las configuran asi y no se modifican ni los ID ni DLC en todo el programa
 #define MBN_RECV_HB                     (Uint16) 31         //numero de CANBUS mailbox que se usa para recibir heartbeat
 #define canbusADDR_MBN_RECV_HB          (Uint32) 0x00000702 //extended addr de canbus para recibir heartbeat
+#define canbusMailBoxPointer_RECV_HB    (struct MBOX *) &ECanaMboxes.MBOX31
 
 #define MBN_RECV_DATA                   (Uint16) 30         //numero de CANBUS mailbox que se usa para recibir data
 #define canbusADDR_MBN_RECV_DATA        (Uint32) 0x00000802 //extended addr de canbus para recibir data
+#define canbusMailBoxPointer_RECV_DATA  (struct MBOX *) &ECanaMboxes.MBOX30
 
 #define MBN_SEND_HB                     (Uint16) 15         //numero de CANBUS mailbox que se usa para enviar HEARTBEAT
 #define canbusADDR_MBN_SEND_HB          (Uint32) 0x00000703 //extended addr de canbus para enviar heartbeat
@@ -44,8 +46,8 @@ struct CAN_MBox mbRecv;          //canbus receiving mailboxes
     void Send_MBox_CANA (union CAN_Data *d, Uint32 i);
     void sendHeartbeat_canbus(union CAN_Data *d);
     void sendDATA_canbus(union CAN_Data *d);
-
-
+    union CAN_Data receiveHEARTBEAT_canbus();
+    union CAN_Data receiveDATA_canbus();
 /**
 * \brief función de inicialización del periférico de CANBUS.
 * contains CANBUS clocks and peripheral initializations needed for the bootloader to work.
@@ -257,7 +259,8 @@ void Config_MBox_CANA (struct CAN_MBox *mb) {
 */
 void Send_MBox_CANA (union CAN_Data *d, Uint32 i) {
     volatile struct MBOX *HardwareMBox;
-    Uint32 Mask = (Uint32)((Uint32)1<<(i));
+    Uint32 Mask =0;
+    Mask = (Uint32) (((Uint32)1)<<((Uint32)(i)));//removed citcea Get_Mask() long switch case and replaced for a simple bitshift
     struct ECAN_REGS ECanaShadow;
 
     // It copies the dates from the software variable to hardware variable
@@ -290,6 +293,48 @@ void sendHeartbeat_canbus(union CAN_Data *d){
 */
 void sendDATA_canbus(union CAN_Data *d){
     Send_MBox_CANA(d, MBN_SEND_DATA);
+}
+
+/**
+* \brief sends a canbus message with data d, using the setup in the data mailbox
+*
+*/
+union CAN_Data checkreceived_MBOX_canbus(Uint16 mailboxNumber ,struct MBOX * MBOXxx ){
+    union CAN_Data aux;
+    Uint32 Mask =0;
+    Mask = (Uint32) (((Uint32)1)<<((Uint32)(mailboxNumber)));
+
+    if(((ECanaRegs.CANRMP.all)&(Mask))==Mask){                                  //if detected new message flag in the corresponding RMP bit
+        ECanaRegs.CANRMP.all &= ~(Mask);                                        //clear the RMP bit
+        aux.newmessage_flag=1;
+        aux.Words.Word0=MBOXxx->MDH.word.HI_WORD;
+        aux.Words.Word1=MBOXxx->MDH.word.LOW_WORD;
+        aux.Words.Word2=MBOXxx->MDL.word.HI_WORD;
+        aux.Words.Word3=MBOXxx->MDL.word.LOW_WORD;
+        return aux;
+    }else{
+        aux.newmessage_flag=0;
+    }
+
+    return aux;
+}
+
+
+/**
+* \brief checks if we received any CANBUS message
+*
+*
+*/
+union CAN_Data receiveHEARTBEAT_canbus(){
+    return checkreceived_MBOX_canbus(MBN_RECV_HB,canbusMailBoxPointer_RECV_HB);
+}
+
+/**
+* \brief checks if we received any CANBUS message
+*
+*/
+union CAN_Data receiveDATA_canbus(){
+    return checkreceived_MBOX_canbus(MBN_RECV_DATA,canbusMailBoxPointer_RECV_DATA);
 }
 
 
