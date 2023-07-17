@@ -40,7 +40,10 @@ union CAN_Data {
     struct CAN_data_DWords  DWords;             // 32bit words
 };
 
-enum CAN_Direction {CAN_TRANSMIT = 0, CAN_RECEIVE = 1};
+enum CAN_Direction {
+    CAN_TRANSMIT = 0,
+    CAN_RECEIVE = 1
+};
 
 struct CAN_MBox {
     Uint16                      Number;                     // Número de la mailbox (0..31)

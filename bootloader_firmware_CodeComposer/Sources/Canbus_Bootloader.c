@@ -37,13 +37,13 @@ struct CAN_MBox mbRecv;          //canbus receiving mailboxes
 
 
 //todas las definiciones de las funciones de este .c , asi son accesibles entre ellas localmente
-void initCanbus(void);
-void configMailboxTXCanbus(void);
-void configMailboxRXCanbus(void);
-void Config_MBox_CANA (struct CAN_MBox *mb);
-void Send_MBox_CANA (union CAN_Data *d, Uint32 i);
-void sendHeartbeat_canbus(union CAN_Data *d);
-void sendDATA_canbus(union CAN_Data *d);
+    void initCanbus(void);
+    void configMailboxTXCanbus(void);
+    void configMailboxRXCanbus(void);
+    void Config_MBox_CANA (struct CAN_MBox *mb);
+    void Send_MBox_CANA (union CAN_Data *d, Uint32 i);
+    void sendHeartbeat_canbus(union CAN_Data *d);
+    void sendDATA_canbus(union CAN_Data *d);
 
 
 /**
@@ -110,8 +110,8 @@ void configMailboxRXCanbus(void){                               //https://www.ti
     mbRecv.AutoAnswerMode           = FALSE;
     mbRecv.AcceptanceMask           = TRUE;
     mbRecv.AcceptanceMaskEnable     = TRUE;
-    mbRecv.InterruptMask            = TRUE;
-    mbRecv.InterruptLowPriority     = TRUE;
+    mbRecv.InterruptMask            = FALSE;
+    mbRecv.InterruptLowPriority     = FALSE;
     mbRecv.OverWriteProtect         = FALSE;
     mbRecv.TimeOutEnable            = FALSE;
 
@@ -125,6 +125,8 @@ void configMailboxRXCanbus(void){                               //https://www.ti
     mbRecv.Identifier       = canbusADDR_MBN_RECV_DATA;
     mbRecv.AcceptanceMask   = mailboxesAcceptanceMasks;
     Config_MBox_CANA(&(mbRecv));                                // Executes the mailbox configuration
+
+
 }
 
 /**
@@ -134,7 +136,8 @@ void configMailboxRXCanbus(void){                               //https://www.ti
 */
 void Config_MBox_CANA (struct CAN_MBox *mb) {
     struct ECAN_REGS ECanaShadow;
-    Uint32 Mask = (Uint32) (1<<(mb->Number));//removed citcea Get_Mask() long switch case and replaced for a simple bitshift
+    Uint32 Mask =0;
+    Mask = (Uint32) (((Uint32)1)<<((Uint32)(mb->Number)));//removed citcea Get_Mask() long switch case and replaced for a simple bitshift
 
     // It obtains the directions of the MailBox, Local Acceptance Mask, Message Time Stamps y Message Time-Out
     mb->HardwareMBox = &(ECanaMboxes.MBOX0) + mb->Number;   // Mailbox
@@ -273,10 +276,18 @@ void Send_MBox_CANA (union CAN_Data *d, Uint32 i) {
     ECanaRegs.CANTRS.all = ECanaShadow.CANTRS.all;
 }
 
+/**
+* \brief sends a canbus message with data d, using the setup in the heartbeat mailbox
+*
+*/
 void sendHeartbeat_canbus(union CAN_Data *d){
     Send_MBox_CANA(d, MBN_SEND_HB);
 }
 
+/**
+* \brief sends a canbus message with data d, using the setup in the data mailbox
+*
+*/
 void sendDATA_canbus(union CAN_Data *d){
     Send_MBox_CANA(d, MBN_SEND_DATA);
 }

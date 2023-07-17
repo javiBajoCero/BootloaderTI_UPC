@@ -52,23 +52,8 @@ int main(void)
     ERTM;     // Enable Global realtime interrupt DBGM
 
 //Superloop
-    Uint32 time=getTick();
-    union CAN_Data data;
-    data.Bytes.Byte0=0x00;
-    data.Bytes.Byte1=0x01;
-    data.Bytes.Byte2=0x02;
-    data.Bytes.Byte3=0x03;
-    data.Bytes.Byte4=0x04;
-    data.Bytes.Byte5=0x05;
-    data.Bytes.Byte6=0x06;
-    data.Bytes.Byte7=0x07;
-    while(1){
-        if(getTick()-time>1000){
-            sendDATA_canbus(&data);
-            sendHeartbeat_canbus(&data);
 
-            time=getTick();
-        }
+    while(1){
         stateMachineBootloader();
     }
 }
