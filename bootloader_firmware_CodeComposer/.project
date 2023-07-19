@@ -24,4 +24,10 @@
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<variableList>
+		<variable>
+			<name>INSTALLROOT_C2000WARE</name>
+			<value>$%7BTI_PRODUCTS_DIR%7D/c2000/C2000Ware_4_03_00_00</value>
+		</variable>
+	</variableList>
 </projectDescription>

@@ -5,8 +5,11 @@
  *  \version   0.0
  *  \date      Jul 10, 2023
  */
+#include "F2806x_Device.h"
+#include "F2806x_GlobalPrototypes.h"
 #include "FLASHhandling_Bootloader.h"
 
+//some info about flash programming https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/171/Flash-Programming-F2812.pdf
 
 /**
 * \brief funcion de inicialización del FLASH memory handler.
@@ -15,6 +18,12 @@
 */
 void initFLASHhandling(void){
 
+    //  *IMPORTANT*
+    //  IF RUNNING FROM FLASH, PLEASE COPY OVER THE SECTION "ramfuncs"  FROM FLASH
+    //  TO RAM PRIOR TO CALLING InitSysCtrl(). THIS PREVENTS THE MCU FROM THROWING
+    //  AN EXCEPTION WHEN A CALL TO DELAY_US() IS MADE.
+
+    InitFlash();
 }
 
 /**

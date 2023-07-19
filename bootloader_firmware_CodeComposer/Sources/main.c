@@ -12,6 +12,9 @@
 
 int main(void)
 {
+// Step 0, copy flash init function from FLASH to RAM (speeds up the Flash memory)
+    memcpy(&RamfuncsRunStart, &RamfuncsLoadStart, (Uint32) &RamfuncsLoadSize);        // Copy time critical code and Flash setup code to RAM
+
 // Step 1. Initialize System Control registers, PLL, WatchDog, Clocks to default state:
     InitSysCtrl();
 
@@ -42,8 +45,8 @@ int main(void)
 
     // ========= Step 4. INITIALIZE ALL THE PERIPHERAL DEVICES ========= //
     initSystick();
-    initFLASHhandling();
     initCanbus();
+    initFLASHhandling();
     initBootloader();
 
 // Step 5. Enable Interrupts:
@@ -52,14 +55,8 @@ int main(void)
     ERTM;     // Enable Global realtime interrupt DBGM
 
 //Superloop
-    union CAN_Data a;
-    while(1){
-        a=receiveDATA_canbus();
-        if(a.newmessage_flag){
-            stateMachineBootloader();
-            a.newmessage_flag=0;
-            GpioDataRegs.GPBTOGGLE.bit.GPIO39=0x01; //Toggles blue LED D10 (debugging)
-        }
 
+    while(1){
+        GpioDataRegs.GPBTOGGLE.bit.GPIO39=0x01; //Toggles blue LED D10 (debugging)
     }
 }
