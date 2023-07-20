@@ -12,5 +12,7 @@
 
 void initFLASHhandling(void);
 void calculateCRCfromFLASHdata(void);
+Uint16 EraseprogrammFlash(void);
+Uint16 copyRAMbufferToFLASHprogrammMemory(void);
 
 #endif /* INCLUDES_FLASHHANDLING_BOOTLOADER_H_ */

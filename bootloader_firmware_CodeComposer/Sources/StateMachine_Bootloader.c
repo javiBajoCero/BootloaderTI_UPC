@@ -26,17 +26,17 @@ Uint32 timestamp=0;
 *
 */
 void initBootloader(void){
-    timestamp=getTick();
-    while(getTick()-timestamp<twoAndAhalfSeconds){//listen for incomming valid CANBUS frames for 2,5 seconds
-//        if(){//if valid CANBUS ID and data, , the state machine should expect to receive some data.
-//            state_StateMachine.step=st_wait;
-//            break;
-//        }
-
-    }
-
-    //if we reached this point 2,5seconds passed with no valid CANBUS, the state machine should jump straight to app.
-    state_StateMachine.step=st_go;
+//    timestamp=getTick();
+//    while(getTick()-timestamp<twoAndAhalfSeconds){//listen for incomming valid CANBUS frames for 2,5 seconds
+////        if(){//if valid CANBUS ID and data, , the state machine should expect to receive some data.
+////            state_StateMachine.step=st_wait;
+////            break;
+////        }
+//
+//    }
+//
+//    //if we reached this point 2,5seconds passed with no valid CANBUS, the state machine should jump straight to app.
+//    state_StateMachine.step=st_go;
 }
 
 /**

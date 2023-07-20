@@ -30,7 +30,6 @@ int main(void)
     DINT;
     IER = 0x0000;
     IFR = 0x0000;
-
     // Initialize Pie Control Registers To Default State:
     InitPieCtrl();
 
@@ -57,6 +56,11 @@ int main(void)
 //Superloop
 
     while(1){
+
+        EraseprogrammFlash();
         GpioDataRegs.GPBTOGGLE.bit.GPIO39=0x01; //Toggles blue LED D10 (debugging)
+        copyRAMbufferToFLASHprogrammMemory();
+        GpioDataRegs.GPBTOGGLE.bit.GPIO39=0x01; //Toggles blue LED D10 (debugging)
+
     }
 }
